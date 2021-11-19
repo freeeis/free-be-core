@@ -1,0 +1,16 @@
+{
+  "name": "free-be-core",
+  "version": "0.0.1",
+  "description": "The core module for the FREE BE system.",
+  "main": "index.js",
+  "author": "zhiquan",
+  "license": "GPL-1.0-or-later",
+  "private": false,
+  "dependencies": {
+    "cookie-parser": "~1.4.3",
+    "helmet": "^3.21.1",
+    "memory-cache": "^0.2.0",
+    "morgan": "^1.9.1",
+    "winston": "^3.1.0"
+  }
+}
