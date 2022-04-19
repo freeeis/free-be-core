@@ -1,7 +1,7 @@
 {
   "name": "free-be-core",
   "version": "0.0.1",
-  "description": "The core module for the FREE BE system.",
+  "description": "The core module for the FreeEIS BE system.",
   "main": "index.js",
   "author": "zhiquan",
   "license": "GPL-1.0-or-later",
