@@ -1,6 +1,6 @@
 {
   "name": "free-be-core",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "The core module for the FreeEIS BE system.",
   "main": "index.js",
   "author": "zhiquan",
@@ -8,7 +8,7 @@
   "private": false,
   "dependencies": {
     "cookie-parser": "~1.4.3",
-    "helmet": "^3.21.1",
+    "helmet": "^6.0.1",
     "memory-cache": "^0.2.0",
     "morgan": "^1.9.1",
     "winston": "^3.1.0"

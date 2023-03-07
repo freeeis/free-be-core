@@ -1,3 +1,12 @@
+/*
+ * @Description: This is the core part of the module which will load all the modules specified in the config file
+ * 
+ * @Author: zhiquan <x.zhiquan@gmail.com>
+ * @Date: 2021-08-03 08:42:06
+ * @LastEditTime: 2023-03-07 14:47:08
+ * @LastEditors: zhiquan
+ */
+
 const path = require("path");
 const express = require(path.resolve('./') + "/node_modules/express");
 const fs = require('fs');
@@ -13,8 +22,8 @@ const builder = require('./builder');
 /**
  * Load a module from the system.
  *
- * @param {*} app
- * @param {*} name
+ * @param {Object} app the global app instancee
+ * @param {String} name name of the module
  */
 const _loadModule = function (app, md) {
     // load md and it's dependencies
@@ -39,7 +48,7 @@ const _loadModule = function (app, md) {
         try{
             mdlFromConfig = require((mPath && `${mPath}/_freemodule.json`) || `${app.projectRoot}/modules/free-be-${name}/_freemodule.json`);
         } catch(ex){}
-
+        
         mdl = require(mPath || `${app.projectRoot}/modules/free-be-${name}`);
         mdlPath = mPath || `${app.projectRoot}/modules/free-be-${name}`;
     } catch (ex) {
@@ -140,8 +149,8 @@ const _loadModule = function (app, md) {
 /**
  * Run a specific hook function from all modules, in the order according to the dependency relationship.
  *
- * @param {*} app
- * @param {*} name
+ * @param {Object} app the global app instance
+ * @param {String} name the hook name to be called
  */
 const _runHook = function (app, name) {
     for (let i = 0; i < app.moduleNames.length; i += 1) {
