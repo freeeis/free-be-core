@@ -1,9 +1,10 @@
 /*
- * @Description: This is the core part of the module which will load all the modules specified in the config file
+ * @Description: This is the core part of the module which will load all the modules 
+ * specified in the config file
  * 
  * @Author: zhiquan <x.zhiquan@gmail.com>
  * @Date: 2021-08-03 08:42:06
- * @LastEditTime: 2023-03-07 14:47:08
+ * @LastEditTime: 2023-03-09 11:48:55
  * @LastEditors: zhiquan
  */
 
@@ -406,9 +407,14 @@ module.exports = {
             buildForConfig(m);
 
             // wrap the service list with the module, and set the module level service name if needed.
-            moduleService[routeRoot] = {
-                ...moduleServiceList
-            };
+            if (routeRoot) {
+                moduleService[routeRoot] = {
+                    ...moduleServiceList
+                };
+            } else {
+                // route root is not empty
+                Object.merge(moduleService, moduleServiceList);
+            }
 
             if (m.config && m.config['asRouteService']) {
                 // this module is the service root (for routers), so we set the service title as this module
