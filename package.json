@@ -7,10 +7,10 @@
   "license": "GPL-1.0-or-later",
   "private": false,
   "dependencies": {
-    "cookie-parser": "~1.4.3",
+    "cookie-parser": "^1.4.6",
     "helmet": "^6.0.1",
     "memory-cache": "^0.2.0",
-    "morgan": "^1.9.1",
-    "winston": "^3.1.0"
+    "morgan": "^1.10.0",
+    "winston": "^3.8.2"
   }
 }
