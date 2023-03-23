@@ -6,6 +6,10 @@
   "author": "zhiquan",
   "license": "GPL-1.0-or-later",
   "private": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/freeeis/free-be-core.git"
+  },
   "dependencies": {
     "cookie-parser": "^1.4.6",
     "helmet": "^6.0.1",
