@@ -4,7 +4,7 @@
  * 
  * @Author: zhiquan <x.zhiquan@gmail.com>
  * @Date: 2021-08-03 08:42:06
- * @LastEditTime: 2023-03-09 11:48:55
+ * @LastEditTime: 2023-03-28 17:50:33
  * @LastEditors: zhiquan
  */
 
@@ -31,10 +31,18 @@ const _loadModule = function (app, md) {
     let mPath = "";
     let name = "";
     if (typeof md === "object") {
-        mPath = md.path;
-        name = md.name;
+      mPath = md.path;
+      name = md.name;
     } else {
-        name = md;
+      name = md;
+
+      if (app.config.modules.findIndex((m) => m === md) < 0) {
+        const objMdl = app.config.modules.find((m) => m.name === md);
+
+        if (objMdl && objMdl.path) {
+          mPath = objMdl.path;
+        }
+      }
     }
 
     if (app.moduleNames.findIndex(m => m === name) >= 0) return;
