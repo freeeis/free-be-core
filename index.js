@@ -250,11 +250,15 @@ module.exports = {
 
             // add some function to the response
             res.endWithErr = async function (code, msg) {
+                if (res._headerSent) return;
+
                 if (typeof msg === 'number') msg = { code: msg };
                 this.status(code).send({ msg: msg });
             };
 
             res.endWithData = function (data, msg = app.config['defaultResponseMessage'] || "OK") {
+                if (res._headerSent) return;
+                
                 this.status(200).send({ data, msg: msg });
             };
 
@@ -289,6 +293,7 @@ module.exports = {
         app.use(function (req, res, next) {
             function unhandledRejection (reason) {
                 logger.error("Uncaught exception: " + reason.message || reason);
+                logger.error(req.originalUrl);
 
                 res.makeError(
                     500,
@@ -306,14 +311,29 @@ module.exports = {
             }
 
             process.on("unhandledRejection", unhandledRejection);
+            process.on("uncaughtException", unhandledRejection);
 
             // Manage to get information from the response too, just like Connect.logger does:
             const end = res.end;
             res.end = function (chunk, encoding) {
+                if (this.statusCode !== 200) {
+                    // run mws before ending with error
+                    const mws = this.beforeReturnErrorMws || []
+                    for(let i = 0; i < mws.length; i += 1) {
+                        mws[i](req, res, next);
+                    }
+
+                    res.beforeReturnErrorMws = [];
+                }
+
                 // Prevent MaxListener on process.events
                 process.removeListener("unhandledRejection", unhandledRejection);
+                process.removeListener("uncaughtException", unhandledRejection);
                 res.end = end;
-                res.end(chunk, encoding);
+
+                if (!res._headerSent) {
+                    res.end(chunk, encoding);
+                }
             };
 
             return next();
@@ -488,6 +508,18 @@ module.exports = {
             if (code === 404) {
                 if (req.originalUrl.startsWith(app.config['assetsUrlPrefix'] ? app.config['assetsUrlPrefix'] + '/' : '/assets/')) code = 200;
             }
+
+            if (code !== 200) {
+                // run mws before ending with error
+                const mws = res.beforeReturnErrorMws || []
+                for(let i = 0; i < mws.length; i += 1) {
+                    mws[i](req, res, next);
+                }
+
+                res.beforeReturnErrorMws = [];
+            }
+
+            if (res._headerSent) return;
 
             let returnData = (code === 200)
                 ? { data, msg: (msg || app.config['defaultResponseMessage'] || "OK") }
