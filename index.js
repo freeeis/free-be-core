@@ -99,12 +99,12 @@ const _loadModule = function (app, md) {
         }
     }
 
-    mdl = Object.merge({}, mdl, mdlFromConfig);
-    // Object.assign(mdl, mdlFromConfig);
-
     if (!mdl) return;
-
+    
     if (typeof mdl === 'function') mdl = mdl(app);
+
+    mdl = Object.merge({}, mdl, mdlFromConfig);
+
     mdl.path = mdlPath;
 
     // attach the app instance to the module instance.
