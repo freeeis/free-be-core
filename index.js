@@ -347,9 +347,6 @@ module.exports = {
                 return next();
             }
         );
-
-        // file upload
-        require("./lib/uploader")(app);
     },
     onAppReady: app => {
         const { buildData } = app.freeBuilder || builder;
