@@ -228,7 +228,49 @@ module.exports = {
         _runHook(app, "onModulesReady");
 
         // setup global middleware
-        app.use(morgan("dev"));
+        morgan.token('date', function () {
+            return new Date().toISOString();
+        });
+
+        morgan.token('status-color', function (req, res) {
+            // 304 use blue, 4xx and 5xx use red, others use green
+            if (res.statusCode === 304) {
+                return '\x1b[34m304\x1b[0m';
+            }
+
+            const colorCode = [
+            400,  // Bad Request
+            401,  // Unauthorized
+            403,  // Forbidden
+            404,  // Not Found
+            405,  // Method Not Allowed
+            408,  // Request Timeout
+            410,  // Gone
+            418,  // I'm a teapot
+            500,  // Internal Server Error
+            501   // Not Implemented
+            ].includes(res.statusCode) ? 31 : 32; // Red for client/server errors, green otherwise
+
+            return `\x1b[${colorCode}m${res.statusCode}\x1b[0m`;
+        });
+
+        app.use(morgan(function (tokens, req, res) {
+            // from green to red, 0-100ms, 100-500ms, 500ms+
+            const resTime = parseInt(tokens['response-time'](req, res), 10);
+            const colorCode = resTime < 100 ? 32 : resTime < 500 ? 33 : 31;
+
+            return [
+                `\x1b[90m${tokens['date'](req, res, 'clf')}\x1b[0m`,
+                `\x1b[36m${tokens['remote-addr'](req, res)}\x1b[0m`,
+                tokens.method(req, res),
+                tokens.url(req, res),
+                tokens['status-color'](req, res),
+                tokens.res(req, res, 'content-length') || '-',
+                `\x1b[${colorCode}m${resTime}ms\x1b[0m`,
+                // tokens['user-agent'](req, res),
+                (req.user && req.user.id) ? req.user.id : '-'
+            ].join(' ')
+        }));
 
         app.use(express.json({ limit: app.config['bodySizeLimit'] || "10mb" }));
         app.use(express.urlencoded({ extended: true }));
@@ -304,14 +346,20 @@ module.exports = {
                 next("route");
             }
 
-            if (process.env.NODE_ENV === "test") {
-                // Un-limit event listeners for testing env only.
-                // Don't set this for production environment due to potential memory leak.
-                process.setMaxListeners(0);
-            }
+            // if (process.env.NODE_ENV === "test") {
+            //     // Un-limit event listeners for testing env only.
+            //     // Don't set this for production environment due to potential memory leak.
+            //     process.setMaxListeners(0);
+            // }
 
             process.on("unhandledRejection", unhandledRejection);
             process.on("uncaughtException", unhandledRejection);
+
+            // Clear the handller at the end of the response
+            res.on('finish', () => {
+                process.removeListener("unhandledRejection", unhandledRejection);
+                process.removeListener("uncaughtException", unhandledRejection);
+            });
 
             // Manage to get information from the response too, just like Connect.logger does:
             const end = res.end;
@@ -326,9 +374,6 @@ module.exports = {
                     res.beforeReturnErrorMws = [];
                 }
 
-                // Prevent MaxListener on process.events
-                process.removeListener("unhandledRejection", unhandledRejection);
-                process.removeListener("uncaughtException", unhandledRejection);
                 res.end = end;
 
                 if (!res._headerSent) {

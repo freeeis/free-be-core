@@ -11,10 +11,10 @@
     "url": "https://github.com/freeeis/free-be-core.git"
   },
   "dependencies": {
-    "cookie-parser": "^1.4.6",
-    "helmet": "^6.0.1",
+    "cookie-parser": "^1.4.7",
+    "helmet": "^8.0.0",
     "memory-cache": "^0.2.0",
     "morgan": "^1.10.0",
-    "winston": "^3.8.2"
+    "winston": "^3.16.0"
   }
 }
