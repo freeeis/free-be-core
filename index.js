@@ -275,9 +275,6 @@ module.exports = {
         app.use(express.json({ limit: app.config['bodySizeLimit'] || "10mb" }));
         app.use(express.urlencoded({ extended: true }));
         app.use(cookieParser());
-        (app.config['staticFolders'] || []).forEach(s => {
-            app.use(app.config['assetsUrlPrefix'] || '/assets', express.static(s, app.config['staticOptions'] || {}));
-        })
 
         // security
         require("./lib/security")(app);
@@ -522,6 +519,10 @@ module.exports = {
         // real db operations
         app.db && app.use(app.db.dataProcessMiddleware);
 
+        (app.config['staticFolders'] || []).forEach(s => {
+            app.use(app.config['assetsUrlPrefix'] || '/assets', express.static(s, app.config['staticOptions'] || {}));
+        })
+        
         // hook!
         _runHook(app, "beforeLastMiddleware");
 
